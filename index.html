@@ -442,7 +442,7 @@ footer a{color:var(--accent)}
           <div class="glabel">Indices for shock</div>
           <div class="defs compact">
             <div class="def"><div class="dh"><b>PAPi</b><span>&gt; 0.9</span></div><p class="formula">(PA systolic − PA diastolic) / RA</p><p>0.9 or less flags severe RV failure after inferior MI.</p></div>
-            <div class="def"><div class="dh"><b>RA : wedge</b><span>&lt; 0.6</span></div><p>Above 0.8 means the RV is the main problem.</p></div>
+            <div class="def"><div class="dh"><b>RA : wedge</b><span>&lt; 0.6</span></div><p>Above 0.6–0.8 points to the RV as the main problem.</p></div>
             <div class="def"><div class="dh"><b>Cardiac power output</b><span>&gt; 0.6 W</span></div><p class="formula">MAP × CO / 451</p><p>Below 0.6 W predicts death in cardiogenic shock.</p></div>
           </div>
         </section>
@@ -520,7 +520,7 @@ const ZONES={
   OUT:{name:"Outside the body",id:"OTHER",note:"The tip has not entered the introducer yet."},
   SVC:{name:"Superior vena cava",id:"RA",note:"Venous tracing with small a and v waves, the same shape as the RA. From the right IJ the RA is usually reached at 15 to 20 cm. Inflate the balloon (1.5 mL) before you cross the tricuspid valve."},
   IVC:{name:"Inferior vena cava",id:"OTHER",note:"A venous tracing that never turns ventricular. From above, no RV tracing by about 40 cm means the catheter went down the IVC or is coiling in the RA. Deflate, withdraw to the RA and re-float."},
-  RA:{name:"Right atrium",id:"RA",note:"Low pressure, usually 2 to 8 mmHg. The a wave follows the P wave; the v wave peaks with the T wave. Balloon up to cross the tricuspid valve."},
+  RA:{name:"Right atrium",id:"RA",note:"Low pressure, usually 2 to 6 mmHg. The a wave follows the P wave; the v wave peaks with the T wave. Balloon up to cross the tricuspid valve."},
   CS:{name:"Coronary sinus",id:"OTHER",note:"An odd, partly arterialized tracing and a very low saturation (coronary venous blood). Withdraw to the RA and re-advance, right side up (left side down); fluoroscopy or TEE helps."},
   RV:{name:"Right ventricle",id:"RV",note:"Sharp systolic upstroke, diastolic pressure near zero that slopes up through diastole, no dicrotic notch. Ectopy is common here; keep advancing steadily with the balloon up."},
   PA:{name:"Pulmonary artery",id:"PA",note:"Diastolic pressure steps up from the RV and slopes down, with a dicrotic notch. From the right IJ the PA is usually reached at 40 to 45 cm."},
@@ -608,25 +608,25 @@ function ecgV(t){
   if(S.rhythm==="af" && !S.chb) v+=0.04*Math.sin(2*Math.PI*6.7*t)+0.03*Math.sin(2*Math.PI*5.1*t+1)+0.02*Math.sin(2*Math.PI*9.3*t+2);
   return v;
 }
-function isCannon(a){const ac=a+0.12; for(const b of V){ if(ac>b.t+0.02 && ac<b.t+0.30) return true;} return false;}
+function isCannon(a){const ac=a+0.10; for(const b of V){ if(ac>b.t+0.02 && ac<b.t+0.30) return true;} return false;}
 function atrialP(t,p,delay){
   let v=p.m;
-  if(S.rhythm!=="af"||S.chb) for(const a of A){ const c=a+0.16+delay; if(Math.abs(t-c)>0.25) continue;
-    v+=(isCannon(a)?p.a*2.5+7:p.a)*g(t,c,0.045); }
+  if(S.rhythm!=="af"||S.chb) for(const a of A){ const c=a+0.10+delay; if(Math.abs(t-c)>0.25) continue;
+    v+=(isCannon(a)?p.a*2.5+7:p.a)*g(t,c,0.04); }
   for(const b of V){ const tR=b.t,q=b.q; if(t<tR-0.15||t>tR+1.2) continue;
-    v+=0.35*Math.max(p.a,2)*g(t,tR+0.05+delay,0.025);
+    if(!delay) v+=0.35*Math.max(p.a,2)*g(t,tR+0.06,0.022); // c wave: damped out in the wedge
     if(p.tr) v+=p.v*0.85*g(t,tR+0.22*q+delay,0.08); else v-=p.x*g(t,tR+0.16*q+delay,0.05);
-    v+=p.v*b.str*g(t,tR+0.36*q+delay,p.vs||0.05);
-    v-=p.y*g(t,tR+0.52*q+delay,0.06);
+    v+=p.v*b.str*g(t,tR+0.40*q+delay,p.vs||0.05);
+    v-=p.y*g(t,tR+0.56*q+delay,0.06);
   }
   return v;
 }
 function ventP(t,p){
-  const i=govV(t,0.04); if(i<0) return p.edp;
-  const b=V[i], u=t-(b.t+0.04), Ds=0.30*b.q; let v;
+  const i=govV(t,0.05); if(i<0) return p.edp;
+  const b=V[i], u=t-(b.t+0.05), Ds=0.30*b.q; let v;
   if(u<Ds){ const base=p.edp+(p.min-p.edp)*(u/Ds); v=base+(p.s-base)*b.str*Math.sin(Math.PI*u/Ds); }
   else { const td=u-Ds; v=p.min+(p.edp-p.min)*(1-Math.exp(-td/(p.dip?0.05:0.15))); }
-  if(S.rhythm!=="af"||S.chb) for(const a of A){ const c=a+0.13; if(Math.abs(t-c)<0.15) v+=(0.2*(p.edp-p.min)+1)*g(t,c,0.035); }
+  if(S.rhythm!=="af"||S.chb) for(const a of A){ const c=a+0.10; if(Math.abs(t-c)<0.15) v+=(0.2*(p.edp-p.min)+1)*g(t,c,0.035); }
   return v;
 }
 function ejectShape(u,q,RRb,tau){
@@ -639,8 +639,8 @@ function ejectShape(u,q,RRb,tau){
   return Math.max(0,f);
 }
 function paP(t,p){
-  const i=govV(t,0.06); if(i<0) return p.d;
-  const b=V[i], nb=V[i+1], u=t-(b.t+0.06), RRb=nb?nb.t-b.t:baseRR();
+  const i=govV(t,0.08); if(i<0) return p.d;
+  const b=V[i], nb=V[i+1], u=t-(b.t+0.08), RRb=nb?nb.t-b.t:baseRR();
   let v=p.d+(p.s-p.d)*b.str*ejectShape(u,b.q,RRb,0.33);
   if(p.pv) for(const bb of V){ const c=bb.t+0.40*bb.q; if(Math.abs(t-c)<0.25) v+=p.pv*g(t,c,0.06); }
   if(S.whip||S.slackRV>0.5){ if(u>0&&u<0.18) v+=9*Math.sin(2*Math.PI*16*u)*Math.exp(-u/0.06); }
@@ -981,7 +981,7 @@ const ABN=[
   {id:"hypovolemic",grp:0,title:"Hypovolemic shock",sign:"Everything low but SVR",set:{path:"hypo",inserted:44},
    nums:[["RA","2","lo"],["PA","18/6",""],["Wedge","4","lo"],["CI","1.6","lo"],["SVR","high","hi"],["SvO₂","56%","lo"]],
    why:"Not enough volume to fill the heart. Low preload, low output, compensatory vasoconstriction. Over-diuresis looks like this.",
-   todo:"Volume, and stop what caused it. In heart failure, a wedge in the mid-teens is the usual target, not a normal value.",src:["ibcc"]},
+   todo:"Volume, and stop what caused it. In chronic heart failure, a “normal” wedge can be too dry: titrate to output and perfusion.",src:["ibcc"]},
   {id:"rvinfarct",grp:0,title:"RV failure (RV infarction)",sign:"RA higher than wedge, narrow PA pulse pressure",set:{path:"rvmi",inserted:44},
    nums:[["RA","17","hi"],["PA","24/16",""],["Wedge","14",""],["PAPi","0.5","lo"],["RA : wedge","1.2","hi"]],
    why:"The RV can't push blood through the lungs, so RA pressure rises while the LV is underfilled. PA pulse pressure narrows.",
@@ -992,7 +992,7 @@ const ABN=[
    todo:"Read the wedge at the a wave, not the mean. Urgent echo, afterload reduction, mechanical support, and surgery.",src:["suzuki","aneskey","ibcc"]},
   {id:"vsr",grp:1,title:"Ventricular septal rupture",sign:"Oxygen step-up from RA to PA",set:{path:"vsr",inserted:44},
    nums:[["RA sat","55%",""],["PA sat","76%","hi"],["Qp : Qs","~1.7","hi"],["RA","14","hi"],["PA","50/26","hi"]],
-   why:"Left-to-right shunt across the septum adds oxygenated blood at the RV. A step-up above about 7% between RA and PA marks the shunt.",
+   why:"Left-to-right shunt across the septum adds oxygenated blood at the RV. A saturation step-up of more than about 7% from the RA to the PA marks the shunt.",
    todo:"Draw saturations from both ports to see it. Thermodilution overstates systemic output here. Afterload reduction, mechanical support, urgent repair.",src:["sasseen","ibcc"]},
   {id:"tamponade",grp:2,title:"Tamponade",sign:"RA, PA diastolic and wedge all equal",set:{path:"tamp",inserted:44},
    nums:[["RA","18","hi"],["PA dia","19","hi"],["Wedge","19","hi"],["CI","low","lo"],["Pulsus","> 10","hi"]],
@@ -1009,7 +1009,7 @@ const ABN=[
   {id:"tr",grp:2,title:"Severe tricuspid regurgitation",sign:"Broad c–v wave, steep y descent",set:{path:"tr",inserted:21},
    nums:[["RA","14","hi"],["v wave","~25","hi"]],
    why:"The RV ejects back into the RA in systole, replacing the x descent with a large wave, then the RA empties fast (steep y).",
-   todo:"Use the RA mean cautiously. Thermodilution output usually reads low.",src:["aneskey","ibcc"]},
+   todo:"Read the RA at end-diastole (the base of the c–v wave), not the mean. Thermodilution output can read low.",src:["aneskey","ibcc"]},
   {id:"af",grp:3,title:"Atrial fibrillation",sign:"No a waves",set:{rhythm:"af",inserted:21},
    nums:[["a wave","absent","lo"]],
    why:"No organized atrial contraction, so the a wave is gone; c and v remain.",
@@ -1243,10 +1243,10 @@ document.querySelectorAll(".tabs [data-tab]").forEach(b=>{
 const STOPS=[
   {id:"RA",label:"RA",sub:"~18 cm",set:{inserted:21,balloonV:0},title:"Right atrium",
    facts:[["Mean","2–6 mmHg"],["Depth (R IJ)","15–20 cm"],["Waves","a, c, v"]],
-   waves:[["a","Atrial contraction. Follows the P wave and sits near the start of the QRS."],["c","Tricuspid valve bulging back as the RV starts to contract. Often too small to see."],["x","Atrial relaxation and the valve plane pulled down during ventricular systole."],["v","Atrial filling against the closed tricuspid valve. Peaks with the end of the T wave."],["y","The tricuspid valve opens and the atrium empties into the RV."]],
+   waves:[["a","Atrial contraction. Follows the P wave, within the PR interval."],["c","Tricuspid valve bulging back as the RV starts to contract, at the end of the QRS. Often small."],["x","Atrial relaxation and the valve plane pulled down during ventricular systole, before the T wave."],["v","Atrial filling against the closed tricuspid valve. Peaks just after the T wave."],["y","The tricuspid valve opens and the atrium empties into the RV, before the next P wave."]],
    tell:"Low pressure with two small humps per beat. Inflate the balloon (1.5 mL) here, before crossing the tricuspid valve."},
   {id:"RV",label:"RV",sub:"~30 cm",set:{inserted:31,balloonV:1.5},title:"Right ventricle",
-   facts:[["Systolic","15–30 mmHg"],["Diastolic","1–6 mmHg"],["Depth (R IJ)","30–35 cm"]],
+   facts:[["Systolic","15–30 mmHg"],["End-diastolic","2–8 mmHg"],["Depth (R IJ)","30–35 cm"]],
    waves:[["Upstroke","Sharp rise just after the QRS as the RV contracts."],["Peak","Systolic pressure, about equal to PA systolic (no pulmonic stenosis)."],["Dip","Pressure falls to near zero in early diastole."],["Rise","Diastolic pressure slopes up as the RV fills; a small atrial kick at the end."],["EDP","End-diastolic pressure, read just before the next upstroke; normally close to RA pressure."]],
    tell:"Systolic pressure jumps from the RA but diastolic stays near zero and slopes up. No dicrotic notch. Expect ectopy; keep advancing steadily with the balloon up."},
   {id:"PA",label:"PA",sub:"~42 cm",set:{inserted:43,balloonV:0},title:"Pulmonary artery",
@@ -1303,10 +1303,10 @@ function drawRef(){
     // annotations on the second beat
     const b=V.find(v=>v.t>t0+0.1), a=A.find(v=>v>b.t-0.3), q=b.q, d=s.id==="PCWP"?0.10:0;
     let marks=[];
-    if(s.id==="RA"||s.id==="PCWP") marks=[[a+0.16+d,"a",1],[b.t+0.05+d,"c",1],[b.t+0.16*q+d,"x",-1],[b.t+0.36*q+d,"v",1],[b.t+0.52*q+d,"y",-1]];
+    if(s.id==="RA"||s.id==="PCWP") marks=[[a+0.10+d,"a",1],[b.t+0.06+d,"c",1],[b.t+0.16*q+d,"x",-1],[b.t+0.40*q+d,"v",1],[b.t+0.56*q+d,"y",-1]];
     if(s.id==="PCWP") marks=marks.filter(m=>m[1]!=="c");
-    if(s.id==="RV"){ const Ds=0.30*q; marks=[[b.t+0.06,"upstroke",1],[b.t+0.04+Ds/2,"peak",1],[b.t+0.04+Ds+0.04,"dip",-1],[b.t+0.04+Ds+0.25,"filling",1],[b.t+rr-0.02,"EDP",-1]]; }
-    if(s.id==="PA"){ marks=[[b.t+0.06+0.10*q,"systolic",1],[b.t+0.06+0.30*q+0.005,"notch",-1],[b.t+0.06+0.30*q+0.22,"runoff",1],[b.t+rr+0.05,"PAD",-1]]; }
+    if(s.id==="RV"){ const Ds=0.30*q; marks=[[b.t+0.07,"upstroke",1],[b.t+0.05+Ds/2,"peak",1],[b.t+0.05+Ds+0.04,"dip",-1],[b.t+0.05+Ds+0.25,"filling",1],[b.t+rr+0.03,"EDP",-1]]; }
+    if(s.id==="PA"){ marks=[[b.t+0.08+0.10*q,"systolic",1],[b.t+0.08+0.30*q+0.005,"notch",-1],[b.t+0.08+0.30*q+0.22,"runoff",1],[b.t+rr+0.07,"PAD",-1]]; }
     x.font="700 13px 'Barlow Condensed', sans-serif"; x.textAlign="center";
     for(const [t,l,dir] of marks){ const xx=X(t), yy=Y(fnP(t)); x.fillStyle="#e9e4c2"; x.beginPath(); x.arc(xx,yy,2.6,0,7); x.fill();
       const ly=yy-dir*16; x.strokeStyle="rgba(233,228,194,.5)"; x.beginPath(); x.moveTo(xx,yy-dir*4); x.lineTo(xx,ly+dir*6); x.stroke(); x.fillText(l,xx,ly); }
