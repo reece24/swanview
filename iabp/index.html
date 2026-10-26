@@ -253,6 +253,12 @@ footer a{color:var(--accent)}
 .mech b{font-family:var(--display);font-size:17px;font-weight:600;color:var(--accent)}
 .marks{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px}
 .mini{display:block;width:100%;height:150px}
+.prac{border-top:1px solid var(--line);padding-top:10px;margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.prac .ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.prac .ph b{font-family:'Barlow Condensed',sans-serif;font-size:17px;letter-spacing:.02em}
+.prac details summary{cursor:pointer;font-weight:600;color:var(--accent,#2b8a8a)}
+.prac details p{margin:6px 0 0}
+.prac .key{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--muted,#667)}
 .ctrl output{min-width:9ch;font-size:15px}
 .vlabel.tiplbl{color:#f4d34a}
 @media (max-width:620px){ .pair{grid-template-columns:1fr} }
@@ -341,8 +347,8 @@ footer a{color:var(--accent)}
           <ol class="marks">
             <li><b>Unassisted systole.</b> The patient's own beat.</li>
             <li><b>Dicrotic notch.</b> Aortic valve closes; inflation starts here, making a sharp V.</li>
-            <li><b>Augmented diastole.</b> Should be higher than unassisted systole.</li>
-            <li><b>Assisted end-diastole.</b> The dip at deflation, about 10–15 lower than unassisted end-diastole.</li>
+            <li><b>Augmented diastole.</b> Rises straight up, parallel to the systolic upstroke, and peaks at or above unassisted systole.</li>
+            <li><b>Assisted end-diastole.</b> The rounded dip at deflation, about 10–20 lower than unassisted end-diastole.</li>
             <li><b>Assisted systole.</b> About 5 lower than unassisted systole, because afterload fell.</li>
           </ol>
         </section>
@@ -360,6 +366,12 @@ footer a{color:var(--accent)}
       <section role="tabpanel" id="pane-timing" aria-labelledby="tab-timing" class="panel" hidden>
         <p class="hint" style="margin:0">Open one to set it on the console. The dashed line on each tracing is correct timing.</p>
         <section class="card abngroup" id="timingList"></section>
+        <section class="card">
+          <h2>Practice: name the error</h2>
+          <p class="hint" style="margin:0">Each strip is 1:2. Name the timing error from the lettered points, then check.</p>
+          <div id="practice"></div>
+          <p class="basis">Adapted from <a href="https://litfl.com/intra-aortic-balloon-pump-trouble-shooting/" target="_blank" rel="noopener">LITFL, IABP troubleshooting</a>.</p>
+        </section>
       </section>
 
       <!-- POSITION -->
@@ -481,7 +493,7 @@ function cycleInfo(i){
   const as=isAssisted(b);
   return {b,e,en,RR:en-e,notch,as,tI:notch+S.infl/1000,tD:en-0.10+S.defl/1000};
 }
-const DIP=13, AUG0=38, UP=0.08, AUG_TAU=0.30;
+const DIP=15, AUG0=38, UP=0.08, AUG_TAU=0.30;
 const FALL=0.10;
 const smooth=x=>x<=0?0:x>=1?1:x*x*(3-2*x);
 function augv(x){ // pressure added while the balloon is inflated, x seconds after inflation
@@ -499,17 +511,17 @@ function balloonAt(c,t){
   if(t>=c.tD) return {add:afterDefl(c,t-c.tD),inflated:false};
   return {add:0,inflated:false};
 }
-function native(c,t,startP,Sk){
-  const u=t-c.e; const f=ejectShape(u,c.b.q,c.RR,0.5);
+function native(c,t,startP,Sk,slow){
+  let u=t-c.e; if(slow) u=u<0.2?u*0.65:u-0.07; const f=ejectShape(u,c.b.q,c.RR,0.5);
   return PT.D+(Sk-PT.D)*f+(startP-PT.D)*Math.max(0,1-u/0.07);
 }
 function startFor(i){ // pressure state handed from the previous cycle
   if(i<=0) return {startP:PT.D,Sk:PT.S,late:null};
   const pc=cycleInfo(i-1); const c=cycleInfo(i);
   if(!pc.as) return {startP:PT.D,Sk:PT.S,late:null};
-  if(pc.tD>c.e){ // late deflation: balloon still up as the heart ejects
-    const lvl=PT.D+augv(c.e-pc.tI);
-    return {startP:lvl,Sk:PT.S+3,late:{until:pc.tD,lvl}};
+  if(pc.tD+FALL>c.e+0.03){ // late deflation: the balloon is still up or emptying as the LV ejects
+    const floor=tt=>tt<pc.tD?PT.D+augv(tt-pc.tI):PT.D+Math.max(0,afterDefl(pc,tt-pc.tD));
+    return {startP:PT.D,Sk:PT.S-2,late:{until:pc.tD,end:pc.tD+FALL,floor}};
   }
   const startP=PT.D+afterDefl(pc,c.e-pc.tD);
   return {startP,Sk:startP<PT.D-5?PT.S-5:PT.S,late:null};
@@ -518,14 +530,17 @@ function cycleIndex(t){ for(let i=V.length-2;i>=0;i--) if(E(V[i])<=t) return i; 
 function artP(t){
   const i=cycleIndex(t); if(i<0) return {p:PT.D,inflated:false,bp:0};
   const c=cycleInfo(i), st=startFor(i);
-  let p=native(c,t,st.startP,st.Sk); let inflated=false;
-  if(st.late){ if(t<st.late.until){ p=Math.max(p,st.late.lvl-8*(t-c.e)); inflated=true; } else { const x=t-st.late.until, held=st.late.lvl-8*(st.late.until-c.e); if(held>p) p=p+(held-p)*(1-smooth(x/FALL)); } }
+  let p=native(c,t,st.startP,st.Sk,!!st.late); let inflated=false;
+  if(st.late && t<st.late.end){ p=Math.max(p,st.late.floor(t)); inflated=t<st.late.until; }
   const bl=balloonAt(c,t); p+=bl.add; inflated=inflated||bl.inflated;
+  if(bl.inflated && c.tI<c.notch-0.02){ // inflation before valve closure masks the notch
+    const u=t-c.e, ej=0.30*c.b.q; p-=(st.Sk-PT.D)*(-0.05*g(u,ej+0.004,0.008)+0.04*g(u,ej+0.03,0.018)); }
   return {p,inflated,bp:balloonPressure(c,t,st,p)};
 }
 function balloonPressure(c,t,st,aortic){ // helium pressure in the balloon line
   const base=2-6*S.gasLoss, plateau=(aortic+6)*(1-0.55*S.gasLoss);
   if(st.late && t<st.late.until) return plateau;
+  if(st.late && t<st.late.end){ const x=t-st.late.until; return base+(plateau-base)*Math.exp(-x/0.008)-48*(1-Math.exp(-x/0.006))*Math.exp(-x/0.045); }
   if(!c.as) return base;
   if(t>=c.tI && t<c.tD){ const x=t-c.tI; const over=(205-plateau)*(1-0.6*S.gasLoss)*Math.exp(-x/0.035)*(1-Math.exp(-x/0.006));
     return base+(plateau-base)*Math.min(1,x/0.012)+over; }
@@ -545,7 +560,7 @@ function resizeCanvas(){
   cvs.width=Math.max(1,Math.round(r.width*dpr)); cvs.height=Math.max(1,Math.round(r.height*dpr)); ctx.setTransform(dpr,0,0,dpr,0,0);
   const want=r.width<520?4:6; if(want!==sweep){ sweep=want; N=FS*sweep; resetBuffers(); }
 }
-let balloonInflated=false;
+let balloonInflated=false, pend=null;
 function step(t){
   genUntil(t+2);
   const r=artP(t); balloonInflated=r.inflated;
@@ -556,10 +571,11 @@ function step(t){
   // per-cycle stats for the console
   const i=cycleIndex(t); if(i<0) return;
   const key=V[i].n;
+  if(pend){ if(t-cyc.e<0.15) pend.end=Math.min(pend.end,r.p); else { finishCycle(pend); pend=null; } }
   if(key!==curCycle){
-    if(cyc) finishCycle(cyc);
+    if(cyc){ if(pend) finishCycle(pend); pend=cyc; }
     const c=cycleInfo(i), st=startFor(i);
-    cyc={as:c.as,prevAs:i>0&&cycleInfo(i-1).as,sys:-1e9,dia:-1e9,end:null,notch:c.notch,e:c.e}; curCycle=key;
+    cyc={as:c.as,prevAs:i>0&&cycleInfo(i-1).as,sys:-1e9,dia:-1e9,end:null,notch:c.as?Math.min(c.notch,c.tI):c.notch,e:c.e}; curCycle=key;
   }
   if(t<cyc.notch) cyc.sys=Math.max(cyc.sys,r.p); else cyc.dia=Math.max(cyc.dia,r.p);
   cyc.end=r.p;
@@ -622,7 +638,7 @@ function inflLabel(v){ return v===0?"at notch":v<0?`${-v} ms early`:`${v} ms lat
 function deflLabel(v){ return v===0?"just before systole":v<0?`${-v} ms early`:`${v} ms late`; }
 function apply(o){
   Object.assign(S,{ratio:2,infl:0,defl:0,pos:"ok",rhythm:"sinus",hr:88,gasLoss:0},o);
-  resetBeats(sampleT); stats={}; cyc=null; curCycle=-1; sync(); if(window.IA3D) IA3D.setPos();
+  resetBeats(sampleT); stats={}; cyc=null; pend=null; curCycle=-1; sync(); if(window.IA3D) IA3D.setPos();
 }
 function sync(){
   document.querySelectorAll("[data-key]").forEach(gr=>{ const k=gr.dataset.key; gr.querySelectorAll("button[data-val]").forEach(b=>b.setAttribute("aria-pressed",String(String(S[k])===b.dataset.val))); });
@@ -653,23 +669,27 @@ function drawStatic(c,o,opts){
     for(let i=0;i<=n;i++){ const t=t0+(t1-t0)*i/n; const r=artP(t); pts.push([t,r.p]); infl.push(r.inflated); }
     let marks=[];
     if(opts&&opts.ideal){ const sv={...S}; Object.assign(S,{infl:0,defl:0}); for(let i=0;i<=n;i++){ const t=t0+(t1-t0)*i/n; ideal.push([t,artP(t).p]); } Object.assign(S,sv); }
-    if(opts&&opts.marks){ const c1=cycleInfo(1), c2=cycleInfo(2), c3=cycleInfo(3);
+    if(opts&&opts.marks){ const c2=cycleInfo(2), c3=cycleInfo(3);
       const at=t=>artP(t).p;
-      const peakIn=(a,b)=>{ let bt=a,bv=-1e9; for(let t=a;t<b;t+=0.004){ const v=at(t); if(v>bv){bv=v;bt=t;} } return [bt,bv]; };
-      // cycle 1 is unassisted (n=1), cycle 2 assisted (n=2)
-      const us=peakIn(c2.e,c2.notch); const nt=[c2.notch,at(c2.notch)]; const ag=peakIn(c2.notch,c2.en-0.05);
-      const ae=[c3.e-0.004,at(c3.e-0.004)]; const as=peakIn(c3.e,c3.notch);
-      marks=[[us,"1"],[nt,"2"],[ag,"3"],[ae,"4"],[as,"5"]]; void c1;
+      const ext=(a,b,sg)=>{ let bt=a,bv=-1e9; for(let t=a;t<b;t+=0.003){ const v=sg*at(t); if(v>bv){bv=v;bt=t;} } return [bt,sg*bv]; };
+      // cycle 2: unassisted systole, then assisted diastole; cycle 3: assisted systole
+      const P={us:ext(c2.e,Math.min(c2.notch,c2.tI)-0.02,1), nt:[c2.notch,at(c2.notch)]};
+      P.ag=ext(Math.max(c2.tI,P.us[0]+0.06),c3.e-0.04,1);
+      P.ae=ext(P.ag[0]+0.05,c3.e+0.12,-1);
+      P.as=ext(Math.max(c3.e,P.ae[0]+0.02),c3.notch-0.02,1);
+      P.ue=ext(c2.e-0.12,c2.e+0.06,-1);
+      const map=opts.marks===true?{us:"1",nt:"2",ag:"3",ae:"4",as:"5"}:opts.marks;
+      marks=Object.entries(map).map(([k,l])=>[P[k],l,k==="ae"||k==="ue"]);
     }
     return {t0,t1,pts,ideal,infl,marks}; });
   const X=t=>L+(t-res.t0)/(res.t1-res.t0)*(W-L-R), Y=v=>T+(1-(clamp(v,30,150)-30)/120)*(H-T-B);
-  x.fillStyle="rgba(79,195,247,.13)"; res.infl.forEach((f,i)=>{ if(f){ const xx=X(res.pts[i][0]); x.fillRect(xx,T,(W-L-R)/res.pts.length+0.6,H-T-B); } });
+  if(!(opts&&opts.noBand)) x.fillStyle="rgba(79,195,247,.13)"; else x.fillStyle="rgba(0,0,0,0)"; res.infl.forEach((f,i)=>{ if(f){ const xx=X(res.pts[i][0]); x.fillRect(xx,T,(W-L-R)/res.pts.length+0.6,H-T-B); } });
   x.font="10px 'IBM Plex Mono', monospace"; x.textBaseline="middle"; x.lineWidth=1;
   for(const v of [40,80,120]){ const y=Math.round(Y(v))+0.5; x.strokeStyle="#12302a"; x.setLineDash([3,4]); x.beginPath(); x.moveTo(L,y); x.lineTo(W-R,y); x.stroke(); x.setLineDash([]); x.fillStyle="#5d716b"; x.fillText(String(v),3,y); }
   if(res.ideal.length){ x.strokeStyle="rgba(232,238,240,.45)"; x.setLineDash([4,4]); x.lineWidth=1.3; x.beginPath(); res.ideal.forEach(([t,v],i)=>i?x.lineTo(X(t),Y(v)):x.moveTo(X(t),Y(v))); x.stroke(); x.setLineDash([]); }
   x.strokeStyle="#ff5a52"; x.lineWidth=2; x.beginPath(); res.pts.forEach(([t,v],i)=>i?x.lineTo(X(t),Y(v)):x.moveTo(X(t),Y(v))); x.stroke();
   x.font="700 12px 'Barlow Condensed', sans-serif"; x.textAlign="center";
-  for(const [[t,v],l] of res.marks){ const xx=X(t), yy=Y(v), up=l!=="4"; x.fillStyle="#e9e4c2"; x.beginPath(); x.arc(xx,yy,2.6,0,7); x.fill();
+  for(const [[t,v],l,down] of res.marks){ const xx=X(t), yy=Y(v), up=!down; x.fillStyle="#e9e4c2"; x.beginPath(); x.arc(xx,yy,2.6,0,7); x.fill();
     x.beginPath(); x.arc(xx,up?yy-15:yy+15,8,0,7); x.fillStyle="#e9e4c2"; x.fill(); x.fillStyle="#03080a"; x.fillText(l,xx,up?yy-14.5:yy+15.5); }
   x.textAlign="left";
 }
@@ -677,7 +697,7 @@ function drawStatic(c,o,opts){
 /* ================= TIMING / POSITION / PROBLEMS ================= */
 const TIMING=[
   {id:"good",title:"Correct timing",sign:"Sharp V at the notch, augmentation above systole, dip before the next beat",set:{infl:0,defl:0},
-   what:"Inflation starts at the dicrotic notch. Augmented diastole exceeds unassisted systole. Assisted end-diastole dips 10–15 below unassisted, and assisted systole is about 5 lower.",
+   what:"Inflation starts at the dicrotic notch. Augmented diastole exceeds unassisted systole. Assisted end-diastole dips 10–20 below unassisted, and assisted systole is about 5 lower.",
    harm:"",fix:""},
   {id:"earlyinfl",title:"Early inflation",sign:"Augmentation merges with systole; no notch",set:{infl:-110},
    what:"The balloon inflates while the LV is still ejecting.",
@@ -691,8 +711,8 @@ const TIMING=[
    what:"The balloon empties long before the next systole, and pressure drifts back up before the heart ejects.",
    harm:"No afterload reduction. Coronary and carotid flow can reverse during the dip, which can cause angina.",
    fix:"Deflate later, just before the next upstroke."},
-  {id:"latedefl",title:"Late deflation",sign:"No dip; assisted end-diastole as high as unassisted; wide, slow upstroke",set:{defl:190},
-   what:"The balloon is still inflated when the LV starts to eject.",
+  {id:"latedefl",title:"Late deflation",sign:"Wide augmentation; trough no lower than unassisted; slow assisted upstroke",set:{defl:90},
+   what:"The balloon is still inflated, or only partly empty, when the aortic valve opens. Augmentation looks widened, the trough is no lower than unassisted end-diastole, and assisted systole rises slowly.",
    harm:"The LV pushes against the balloon: afterload and oxygen demand go up instead of down. Potentially harmful.",
    fix:"Deflate earlier, just before systole."}
 ];
@@ -741,6 +761,45 @@ $("probList").addEventListener("click",e=>{ const b=e.target.closest("[data-px]"
   openX=openX===id?null:id; renderLists(); if(openX){ apply(PROBS.find(a=>a.id===id).set); if(id==="gas") flash("Check the tubing for blood","red",6000); } });
 document.querySelectorAll("[data-wean]").forEach(b=>b.addEventListener("click",()=>apply({ratio:parseInt(b.dataset.wean,10)})));
 $("btnNormal").addEventListener("click",()=>apply({}));
+
+/* ================= PRACTICE ================= */
+const PRACTICE=[
+  {id:"lateinfl",set:{infl:160},marks:{us:"A",nt:"B",ag:"C",ae:"D",as:"E"},
+   key:"A unassisted systole · B dicrotic notch · C augmentation · D assisted end-diastole · E assisted systole",
+   ans:"Late inflation",
+   feat:"The notch (B) is plainly visible and pressure keeps falling before the balloon fills. Augmentation (C) starts late, is narrow, and peaks below unassisted systole (A).",
+   eff:"Less diastolic augmentation, so less coronary perfusion.",
+   fix:"Inflate earlier, so inflation lands on the notch and forms a sharp V."},
+  {id:"earlydefl",set:{defl:-200},marks:{us:"A",ag:"B",ae:"C",as:"D",ue:"E"},
+   key:"A unassisted systole · B augmentation · C assisted end-diastole · D assisted systole · E unassisted end-diastole",
+   ans:"Early deflation",
+   feat:"Augmentation (B) is followed by a sharp drop in mid-diastole and a U-shaped trough (C). Pressure drifts back up before the next beat, so assisted systole (D) is no lower than unassisted (A).",
+   eff:"Augmentation is cut short. There is no afterload reduction, so oxygen demand is not lowered. Coronary and carotid flow can reverse during the dip, which can cause angina.",
+   fix:"Deflate later, just before the next upstroke."},
+  {id:"earlyinfl",set:{infl:-110},marks:{us:"A",ag:"B",ae:"C",as:"D"},
+   key:"A unassisted systole · B augmentation · C assisted end-diastole · D assisted systole",
+   ans:"Early inflation",
+   feat:"Inflation starts before the notch, so augmentation (B) runs into the tail of systole and the notch disappears.",
+   eff:"The aortic valve closes early while the LV is still ejecting. Stroke volume falls; LV volume, wedge and oxygen demand rise; aortic regurgitation can worsen. The most harmful error.",
+   fix:"Inflate later, at the dicrotic notch."},
+  {id:"latedefl",set:{defl:90},marks:{us:"A",nt:"B",ag:"C",ae:"D",as:"E",ue:"F"},
+   key:"A unassisted systole · B dicrotic notch · C augmentation · D assisted end-diastole · E assisted systole · F unassisted end-diastole",
+   ans:"Late deflation",
+   feat:"Augmentation (C) looks widened. The trough (D) is about the same as unassisted end-diastole (F), not lower. Assisted systole (E) rises slowly because the LV starts ejecting against a balloon that is still emptying.",
+   eff:"No afterload reduction; afterload and oxygen demand can rise. Potentially harmful.",
+   fix:"Deflate earlier, just before systole."}
+];
+function renderPractice(){
+  const el=$("practice"); if(!el) return;
+  if(!el.childElementCount) el.innerHTML=PRACTICE.map((q,i)=>`<div class="prac">
+    <div class="ph"><b>Strip ${i+1}</b><button class="ghost" type="button" data-pr="${q.id}">Show on console</button></div>
+    <div class="refwrap"><canvas class="mini" id="pr-${q.id}" aria-label="Practice tracing ${i+1}"></canvas></div>
+    <div class="key">${q.key}</div>
+    <details><summary>Answer</summary><p><b>${q.ans}.</b> ${q.feat}</p><p><b>Effect</b> ${q.eff}</p><p><b>Fix</b> ${q.fix}</p></details>
+  </div>`).join("");
+  requestAnimationFrame(()=>PRACTICE.forEach(q=>drawStatic($("pr-"+q.id),q.set,{marks:q.marks,noBand:true})));
+}
+$("practice").addEventListener("click",e=>{ const b=e.target.closest("[data-pr]"); if(!b) return; apply(PRACTICE.find(q=>q.id===b.dataset.pr).set); });
 function setView(v){ S.view=v; if(window.IA3D) IA3D.setView(v); sync(); }
 
 /* ================= 3D ================= */
@@ -851,7 +910,7 @@ const TABS=["how","timing","position","care"]; let currentTab="how";
 function setTab(t){ if(!TABS.includes(t)) t="how"; currentTab=t;
   for(const k of TABS){ $("tab-"+k).setAttribute("aria-selected",String(k===t)); $("tab-"+k).tabIndex=k===t?0:-1; $("pane-"+k).hidden=k!==t; }
   try{ localStorage.setItem("swanview-iabp-tab",t); }catch(e){}
-  requestAnimationFrame(()=>{ if(t==="how") drawStatic($("howCanvas"),{},{marks:true}); renderLists(); });
+  requestAnimationFrame(()=>{ if(t==="how") drawStatic($("howCanvas"),{},{marks:true}); renderLists(); if(t==="timing") renderPractice(); });
 }
 document.querySelectorAll(".tabs [data-tab]").forEach(b=>{ b.addEventListener("click",()=>setTab(b.dataset.tab));
   b.addEventListener("keydown",e=>{ if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return; const i=TABS.indexOf(b.dataset.tab); const n=TABS[(i+(e.key==="ArrowRight"?1:TABS.length-1))%TABS.length]; setTab(n); $("tab-"+n).focus(); }); });
@@ -864,7 +923,7 @@ function frame(ts){
   requestAnimationFrame(frame);
 }
 let rT=null;
-function onResize(){ resizeCanvas(); if(window.IA3D) IA3D.resize(); clearTimeout(rT); rT=setTimeout(()=>{ if(currentTab==="how") drawStatic($("howCanvas"),{},{marks:true}); if(openT) renderLists(); },150); }
+function onResize(){ resizeCanvas(); if(window.IA3D) IA3D.resize(); clearTimeout(rT); rT=setTimeout(()=>{ if(currentTab==="how") drawStatic($("howCanvas"),{},{marks:true}); if(openT) renderLists(); if(currentTab==="timing") renderPractice(); },150); }
 window.addEventListener("resize",onResize); if(window.ResizeObserver) new ResizeObserver(onResize).observe($("viewer"));
 (function boot(){
   let tab=null; try{ tab=localStorage.getItem("swanview-iabp-tab"); }catch(e){}
