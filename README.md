@@ -5,7 +5,9 @@ A free, browser-based teaching simulator for the pulmonary artery (Swan-Ganz) ca
 - **Tracings:** what the RA, RV, PA and wedge waveforms look like and how to tell them apart.
 - **Patients:** float the catheter through different physiology, rhythms and breathing.
 - **Normal values:** pressures, what each number means, and shock profiles.
-- **Overnight pages:** short troubleshooting cases built on published reports and teaching sources.
+- **Abnormal readings:** shock states, post-MI complications, pericardial and valve disease, rhythm, and measurement or catheter problems.
+
+A second page, `iabp/`, covers the intra-aortic balloon pump: mechanism, the 1:2 tracing, timing errors, position on the film, weaning and troubleshooting.
 
 Educational use only. Not for clinical decisions.
 
@@ -15,7 +17,7 @@ Everything is in `index.html`. Open it in a browser, or serve the folder with an
 
 ## Attribution
 
-Heart, great vessel, vena cava, brachiocephalic, iliac and lung anatomy come from the Human Reference Atlas
+Heart, aorta and branches, great vessels, vena cava, brachiocephalic, iliac and lung anatomy come from the Human Reference Atlas
 3D Reference Object Library (Visible Human Male), HuBMAP, licensed CC BY 4.0
 (https://creativecommons.org/licenses/by/4.0/). The models were decimated and re-centered for the web.
 Jugular and subclavian veins, ribs and spine are schematic.
