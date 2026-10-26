@@ -10,7 +10,27 @@
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#03080a">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2303080a'/%3E%3Cpath d='M8 38h10l4-14 6 26 5-30 5 22 4-4h14' fill='none' stroke='%23f4d34a' stroke-width='4' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}/* Abnormal readings */
+.abngroup{gap:0;padding-block:12px 4px}
+.card.abngroup h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.abn{border-top:1px solid var(--line)}
+.abnhead{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;background:none;border:0;padding:10px 0;text-align:left;cursor:pointer}
+.abnhead strong{display:block;font-family:var(--display);font-size:18px;font-weight:600;line-height:1.2}
+.abnhead .sign{display:block;font-size:14px;color:var(--muted)}
+.abnhead:hover strong{color:var(--accent)}
+.abn .chev{font-size:22px;color:var(--muted);transition:transform .15s}
+.abn.open .chev{transform:rotate(90deg);color:var(--accent)}
+.abn.open .abnhead strong{color:var(--accent)}
+.abnbody{display:flex;flex-direction:column;gap:8px;padding:0 0 14px}
+.abnbody p{font-size:14px;margin:0;max-width:68ch}
+.abnbody p b{font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.nums2{display:flex;flex-wrap:wrap;gap:6px}
+.nums2 .n{background:var(--surface2);border-radius:7px;padding:5px 9px;display:flex;flex-direction:column;min-width:64px}
+.nums2 .k{font-family:var(--display);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.nums2 b{font-family:var(--display);font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.nums2 .hi b{color:var(--danger)} .nums2 .lo b{color:var(--accent)}
+@media (prefers-reduced-motion:reduce){.abn .chev{transition:none}}
+</style>
 </head>
 <body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -158,26 +178,10 @@ ul.tight{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
 .waves{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:14px;margin:0}
 .waves dt{font-family:var(--display);font-weight:700;font-size:16px;color:var(--accent)}
 .waves dd{margin:0}
-.changes{display:flex;flex-direction:column}
-.change{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;padding:9px 0;border-bottom:1px solid var(--line);align-items:center}
-.change:last-child{border-bottom:0}
-.change strong{font-family:var(--display);font-size:17px;font-weight:600}
-.change p{font-size:14px;color:var(--muted);grid-column:1}
-.change button{grid-row:1 / span 2;grid-column:2}
 
 /* Pages */
-.scenario{border-left:4px solid var(--accent)}
-.scenario .eyebrow{font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;font-size:13px;color:var(--accent);font-weight:600}
 .basis{font-size:13px;color:var(--muted)}
 .basis a{color:var(--accent)}
-.answer{border-top:1px dashed var(--line);padding-top:10px}
-.answer ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
-.caselist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
-.case{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:5px;text-align:left;cursor:pointer}
-.case:hover{border-color:var(--accent)}
-.case .k{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.case strong{font-family:var(--display);font-size:18px;font-weight:600;line-height:1.15}
-.case span.d{font-size:13px;color:var(--muted)}
 .idrow button{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:8px 12px;font-family:var(--display);font-size:17px;font-weight:600;cursor:pointer}
 .idrow button:hover{border-color:var(--accent)}
 .feedback{font-size:14px;min-height:1.4em}
@@ -242,10 +246,6 @@ footer a{color:var(--accent)}
 .slider label{font-family:var(--display);font-size:13px;font-weight:600;letter-spacing:.08em;color:var(--muted);min-width:4.5ch}
 .slider input{flex:1}
 .slider output{font-family:var(--display);font-size:18px;font-weight:600;min-width:3ch;text-align:right;font-variant-numeric:tabular-nums}
-.casegroup{display:flex;flex-direction:column;gap:8px}
-.casegroup h3{margin:4px 0 0;font-family:var(--display);font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.changes h3{margin:10px 0 2px;font-family:var(--display);font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.changes h3:first-child{margin-top:0}
 @media (max-width:620px){ .ch .v{font-size:18px;white-space:normal} .circrow{gap:12px} .ch{padding:7px 8px;min-width:0} }
 </style>
 
@@ -324,9 +324,8 @@ footer a{color:var(--accent)}
         <button role="tab" type="button" id="tab-tracings" aria-controls="pane-tracings" data-tab="tracings">Tracings</button>
         <button role="tab" type="button" id="tab-sim" aria-controls="pane-sim" data-tab="sim">Patients</button>
         <button role="tab" type="button" id="tab-numbers" aria-controls="pane-numbers" data-tab="numbers">Normal values</button>
-        <button role="tab" type="button" id="tab-pages" aria-controls="pane-pages" data-tab="pages">Overnight pages</button>
+        <button role="tab" type="button" id="tab-abnormal" aria-controls="pane-abnormal" data-tab="abnormal">Abnormal readings</button>
       </nav>
-      <div class="activecase" id="activeCase" hidden><span id="activeCaseTxt"></span><button type="button" id="activeCaseOpen">Open</button></div>
 
       <!-- TRACINGS -->
       <section role="tabpanel" id="pane-tracings" aria-labelledby="tab-tracings" class="panel">
@@ -346,10 +345,6 @@ footer a{color:var(--accent)}
           <div class="cardhead"><h2>The float</h2><button class="primary" type="button" id="btnFloat">Float it</button></div>
           <p>RA to RV: systolic jumps, diastolic stays low. RV to PA: diastolic steps up and slopes down.</p>
           <div class="refwrap"><canvas class="pullcanvas" id="pullCanvas" aria-label="Continuous tracing from right atrium to wedge"></canvas></div>
-        </section>
-        <section class="card">
-          <h2>When the tracing changes</h2>
-          <div class="changes" id="changes"></div>
         </section>
       </section>
 
@@ -478,17 +473,10 @@ footer a{color:var(--accent)}
         </section>
       </section>
 
-      <!-- PAGES -->
-      <section role="tabpanel" id="pane-pages" aria-labelledby="tab-pages" class="panel" hidden>
-        <section class="card scenario" id="scenario" hidden>
-          <div class="eyebrow" id="scEyebrow">Page</div>
-          <h2 id="scTitle"></h2>
-          <p id="scPrompt"></p>
-          <div class="row"><button class="primary" id="scReveal" type="button">Show answer</button><button class="ghost" id="scReload" type="button">Restart</button><button class="ghost" id="scClose" type="button">Close</button></div>
-          <div class="answer" id="scAnswer" hidden></div>
-          <p class="basis" id="scBasis"></p>
-        </section>
-        <div id="caseList" class="panel"></div>
+      <!-- ABNORMAL READINGS -->
+      <section role="tabpanel" id="pane-abnormal" aria-labelledby="tab-abnormal" class="panel" hidden>
+        <p class="hint" style="margin:0">Open one to load it on the monitor.</p>
+        <div id="abnList" class="panel"></div>
       </section>
     </div>
   </div>
@@ -952,120 +940,6 @@ function takeSample(port){
 $("btnSampleD").addEventListener("click",()=>takeSample("distal"));
 $("btnSampleP").addEventListener("click",()=>takeSample("proximal"));
 
-/* ================= CASES ================= */
-const SRC={
-  litflIns:{label:"LITFL, Troubleshooting PAC insertion",url:"https://litfl.com/troubleshooting-pac-insertion"},
-  litflMeas:{label:"LITFL, Troubleshooting PAC measurement",url:"https://litfl.com/troubleshooting-pac-measurement/"},
-  litflPawp:{label:"LITFL, Pulmonary artery wedge pressure",url:"https://litfl.com/pulmonary-artery-wedge-pressure/"},
-  ibcc:{label:"EMCrit IBCC, Right heart catheterization",url:"https://emcrit.org/ibcc/rhc/"},
-  deranged:{label:"Deranged Physiology, Insertion of the PA catheter",url:"https://derangedphysiology.com/main/cicm-primary-exam/cardiovascular-system/Chapter-802/insertion-pulmonary-artery-catheter"},
-  atreya:{label:"Atreya et al., Acute Cardiac Care 2016 (PA rupture with pseudoaneurysm after balloon inflation)",url:"https://doi.org/10.3109/17482941.2016.1174270"},
-  abreu:{label:"Abreu et al., J Intensive Care Med 2004 (PA rupture, review)",url:"https://doi.org/10.1177/0885066604265255"},
-  suzuki:{label:"Suzuki et al., J Cardiol Cases 2026 (unilateral pulmonary edema, prominent right-sided V wave)",url:"https://doi.org/10.1016/j.jccase.2026.03.006"},
-  sasseen:{label:"Sasseen et al., Catheter Cardiovasc Interv 2003 (post-MI ventricular septal rupture)",url:"https://doi.org/10.1002/ccd.10696"},
-  kapur:{label:"Korabathina, Kapur et al., Catheter Cardiovasc Interv 2012 (PAPi in inferior MI)",url:"https://doi.org/10.1002/ccd.23309"},
-  masuda:{label:"Masuda et al., Masui 2001 (persistent left SVC found after PA catheter)",url:"https://pubmed.ncbi.nlm.nih.gov/11712344/"},
-  aneskey:{label:"Interpretation of hemodynamic waveforms (Anesthesia Key)",url:"https://aneskey.com/interpretation-of-hemodynamic-waveforms/"}
-
-};
-const CASE_GROUPS=["Shock","New findings","Is the number real?","Catheter emergencies"];
-const CASES=[
-  // ---- Shock
-  {id:"profile",grp:CASE_GROUPS[0],title:"Is it cardiogenic?",desc:"Hypotensive after a large anterior MI.",
-   basis:["ibcc"],set:{path:"lvshock",inserted:44},
-   prompt:"Night float, CCU. A patient with a large anterior MI is now at MAP 70 on norepinephrine. Thermodilution output is 3.0 L/min (index 1.5). Read the RA and PA, get a wedge (inflate, read, deflate), and draw an SvO₂. What is the shock type, and what do you do next?",
-   answer:["RA about 11, PA about 50/30, wedge about 27, SvO₂ about 50%, index 1.5.",
-     "High wedge, low index, low SvO₂, high SVR: cardiogenic shock from LV failure. PAPi is about (50 − 30) / 11 ≈ 1.8, so the RV is holding up.",
-     "Cardiac power output ≈ 70 × 3.0 / 451 ≈ 0.47 W, below 0.6 W. That marks high mortality: call the shock team, add an inotrope, and consider mechanical support."]},
-  {id:"sepsis",grp:CASE_GROUPS[0],title:"Hypotensive, febrile, known HFrEF",desc:"Is the heart the problem?",
-   basis:["ibcc"],set:{path:"sepsis",inserted:44},
-   prompt:"A patient with HFrEF (EF 30%) is febrile and hypotensive on norepinephrine. The team wants to start dobutamine for “cardiogenic shock.” Read the numbers first. Output is 8.2 L/min.",
-   answer:["RA about 5, wedge about 10, cardiac output 8.2, SvO₂ about 80%, low SVR.",
-     "Normal filling pressures with a high output and high SvO₂ is distributive (septic) shock, not cardiogenic. The heart is keeping up.",
-     "Dobutamine would add vasodilation and tachycardia without helping. Treat the infection and the vascular tone: norepinephrine, then vasopressin. Recheck the profile if output falls."]},
-  {id:"rvmi",grp:CASE_GROUPS[0],title:"Hypotension with clear lungs",desc:"Inferior STEMI, HR 54.",
-   basis:["kapur","ibcc","aneskey"],set:{path:"rvmi",inserted:44},
-   prompt:"Inferior STEMI from a proximal RCA occlusion. BP 80/54, HR 54, clear lungs. Read RA, PA and wedge, then work out PAPi and RA : wedge.",
-   answer:["RA about 17, PA 24/16, wedge about 14. PAPi = (24 − 16) / 17 ≈ 0.5. RA : wedge is above 1.",
-     "RV infarction. In the study that introduced PAPi, 0.9 or less identified death or need for RV support after inferior MI.",
-     "The RV is preload-dependent: avoid nitrates and diuretics, give volume cautiously (stop if RA keeps rising), restore rate and AV synchrony (pacing), start an inotrope, and consider RV support early."]},
-  {id:"tamp",grp:CASE_GROUPS[0],title:"Everything reads about 19",desc:"Six hours after cardiac surgery.",
-   basis:["ibcc","aneskey"],set:{path:"tamp",inserted:44},
-   prompt:"Six hours after cardiac surgery: tachycardic, hypotensive, chest tubes quiet. Compare RA, PA diastolic and wedge, and watch the arterial line with breathing.",
-   answer:["RA, PA diastolic and wedge are all 18–20: equalization. The RA has a blunted y descent, and the arterial line shows pulsus paradoxus.",
-     "Tamponade until proven otherwise. After surgery it can be a localized clot that a transthoracic echo misses. Call the surgeons; the fix is re-exploration, not more pressors."]},
-  {id:"dry",grp:CASE_GROUPS[0],title:"Hypotensive after diuresis",desc:"Net −6 L in two days, creatinine rising.",
-   basis:["ibcc"],set:{path:"hypo",inserted:44},
-   prompt:"Admitted with decompensated HFrEF and diuresed net −6 L over 48 hours. Now BP 88/52, HR 114, creatinine up. Is this low output from the heart or from the tank?",
-   answer:["RA about 2, PA 18/6, wedge about 4, low output.",
-     "Low filling pressures with low output: intravascular depletion from over-diuresis. A failing LV would show a high wedge.",
-     "Hold diuretics, give small fluid boluses, and recheck the wedge. Aim for a wedge in the mid-teens for a patient with HFrEF, not normal values."]},
-  // ---- New findings
-  {id:"mr",grp:CASE_GROUPS[1],title:"Giant waves on the wedge",desc:"Flash pulmonary edema, new murmur.",
-   basis:["suzuki","ibcc","aneskey"],set:{path:"mr",inserted:50,balloonV:1.5},
-   prompt:"Day 3 after an inferoposterior MI: sudden pulmonary edema and a new murmur. You are wedged. What are the big waves, and what is the real wedge?",
-   answer:["Giant v waves from acute MR, here likely papillary muscle rupture. The v wave peaks after the T wave; PA systole peaks within it, so you are not looking at a PA trace.",
-     "Read at the a wave, just after the QRS. The mean, and especially the v peak, overstates LV filling.",
-     "Get an urgent echo and call cardiac surgery. Afterload reduction and an IABP or Impella bridge to repair. One published case showed the jet aimed at the right pulmonary veins, causing one-sided edema."]},
-  {id:"vsr",grp:CASE_GROUPS[1],title:"New murmur after an anterior MI",desc:"Hypotensive on day 4.",
-   basis:["sasseen","ibcc"],set:{path:"vsr",inserted:44},
-   prompt:"Day 4 after an anterior STEMI: a new harsh holosystolic murmur and hypotension. Draw saturations from the proximal port (RA) and distal port (PA).",
-   answer:["Step-up from about 55% in the RA to 76% in the PA. More than about 7% at the ventricular level means a left-to-right shunt: ventricular septal rupture.",
-     "Qp : Qs ≈ (SaO₂ − RA sat) / (pulmonary vein sat − PA sat) ≈ (93 − 55) / (98 − 76) ≈ 1.7. Thermodilution here measures pulmonary flow and overstates systemic output.",
-     "Papillary muscle rupture gives giant v waves without a step-up. Both need urgent surgery; reduce afterload and bridge with mechanical support."]},
-  {id:"pah",grp:CASE_GROUPS[1],title:"Pre- or post-capillary?",desc:"Dyspnea, PA pressures in the 70s.",
-   basis:["ibcc","litflPawp"],set:{path:"pah",inserted:44},
-   prompt:"Progressive dyspnea; echo estimates a high RV systolic pressure. Read the mean PA and wedge. Output is 3.6 L/min. Classify the pulmonary hypertension.",
-   answer:["Mean PA about 52, wedge about 9, PA diastolic 32. PVR ≈ (52 − 9) / 3.6 ≈ 12 Wood units.",
-     "Mean above 20, wedge 15 or less, PVR above 2: precapillary pulmonary hypertension. The large PA diastolic-to-wedge gap says the same thing.",
-     "Avoid aggressive fluid in a failing RV. Look for causes (thromboembolic disease, lung disease, PAH), and involve the pulmonary hypertension team before starting pulmonary vasodilators."]},
-  {id:"constr",grp:CASE_GROUPS[1],title:"Square root sign",desc:"Edema and ascites after chest radiation.",
-   basis:["ibcc","aneskey"],set:{path:"constr",inserted:32,balloonV:1.5},
-   prompt:"Years after chest radiation, progressive edema and ascites. The tip is in the RV. Describe the diastolic pressure, then pull back to the RA and watch it with breathing.",
-   answer:["Dip and plateau: an early diastolic dip, then a rapid rise to a plateau. RV end-diastolic pressure (17) is over a third of systolic (34): constrictive or restrictive physiology.",
-     "The RA shows deep x and y descents and does not fall with inspiration (Kussmaul sign). Separating constriction from restriction needs simultaneous LV and RV tracings and imaging."]},
-  // ---- Is the number real?
-  {id:"ee",grp:CASE_GROUPS[2],title:"Numbers swing with each breath",desc:"Intubated, cardiogenic shock.",
-   basis:["ibcc"],set:{path:"lvshock",resp:"vent",peep:10,inserted:50,balloonV:1.5},
-   prompt:"Intubated in cardiogenic shock. The wedge swings with the ventilator, and the monitor shows a digital value you don't trust. Which number goes in your note? Then switch to Labored breathing (Patients tab).",
-   answer:["Read at end-expiration (the EE marks). On the ventilator it is the low point before each breath. Breathing on their own, it is the high point before each breath. The monitor's digital average misleads either way.",
-     "PEEP adds to every pressure. A rough transmural wedge is the measured wedge minus 0.36 × PEEP; it matters little below PEEP 10."]},
-  {id:"zone",grp:CASE_GROUPS[2],title:"Wedge above PA diastolic",desc:"ARDS on PEEP 16.",
-   basis:["litflPawp","litflIns","ibcc"],set:{path:"ards",resp:"vent",peep:16,inserted:50.5,balloonV:1.5,branch:"ant"},
-   prompt:"ARDS on PEEP 16. The wedge reads higher than the PA diastolic and swings with each breath. The team wants to diurese for a “wedge of 22.” Is it real? Try PEEP 8, then the Lateral view.",
-   answer:["Not zone 3. The tip is in a non-dependent branch where alveolar pressure beats venous pressure, so the trace follows the airway: smooth, no a or v waves, big swings, above PA diastolic.",
-     "A true wedge sits below PA diastolic, shows a and v waves, and the tip lies at or below the left atrium on a lateral film.",
-     "Don't diurese on this number. Have the catheter repositioned to a dependent lower-lobe branch, or use the PA diastolic as a surrogate."]},
-  {id:"level",grp:CASE_GROUPS[2],title:"Every number jumped overnight",desc:"CVP 4 to 11, no clinical change.",
-   basis:["ibcc","litflMeas"],set:{inserted:44,level:10},
-   prompt:"At 4 a.m. the CVP went from 4 to 11, and the PA systolic and diastolic each rose by about the same amount. The patient looks the same. The nurse asks about giving furosemide.",
-   answer:["Every pressure rose by the same 7 mmHg. That is the transducer, now about 10 cm below the phlebostatic axis (the bed was raised).",
-     "Re-level to the 4th intercostal space at the mid-axillary line and re-zero before acting on any number.",
-     "If the numbers are level but the waveform looks rounded with a narrow pulse pressure, the line is overdamped: a flush test confirms it."]},
-  // ---- Catheter emergencies
-  {id:"migration",grp:CASE_GROUPS[3],title:"PA trace looks like a wedge",desc:"Balloon down, hours after placement.",
-   basis:["litflMeas","ibcc"],set:{inserted:57},
-   prompt:"The nurse pages: the balloon is down, but the PA trace “looks like a CVP now.” What happened, and what do you order?",
-   answer:["Spontaneous wedge. The catheter softened and migrated into a small branch, which it now occludes. Left there, it risks pulmonary infarction and rupture.",
-     "Don't flush. Pull back with the balloon down until the PA tracing returns, then get a chest film: tip in the main or proximal interlobar PA, within 1–2 cm of the mediastinal edge."]},
-  {id:"rupture",grp:CASE_GROUPS[3],title:"Hemoptysis after a wedge",desc:"Severe pulmonary hypertension, anticoagulated.",
-   basis:["atreya","abreu","ibcc"],set:{path:"pah",rhythm:"af",inserted:52.5,ruptureRisk:true},
-   prompt:"Elderly, severe pulmonary hypertension, AF on anticoagulation. You ask for a wedge at 3 a.m. Inflate slowly and watch. (Based on a published case.)",
-   answer:["The tip was already distal. A pressure that keeps rising during inflation is an overwedge. The balloon should have come down the moment the waveform changed.",
-     "Hemoptysis after inflation is PA rupture until proven otherwise; mortality exceeds 50%. Keep the catheter in, turn bleeding side down, secure the airway (consider lung isolation), reverse anticoagulation, and get emergent CT angiography for embolization. That is what saved the patient in the published case.",
-     "Prevention: in severe pulmonary hypertension, ask whether you need a wedge at all. The PA diastolic is often good enough."]}
-];
-const caseList=$("caseList");
-CASE_GROUPS.forEach(gname=>{
-  const g=document.createElement("section"); g.className="casegroup"; g.innerHTML=`<h3>${gname}</h3><div class="caselist"></div>`;
-  const list=g.querySelector(".caselist");
-  CASES.forEach((c,i)=>{ if(c.grp!==gname) return; const b=document.createElement("button"); b.type="button"; b.className="case";
-    b.innerHTML=`<span class="k">Page ${i+1}</span><strong>${c.title}</strong><span class="d">${c.desc}</span>`;
-    b.addEventListener("click",()=>loadCase(c,true)); list.appendChild(b); });
-  caseList.appendChild(g);
-});
-
-let currentCase=null;
 function applyState(o){
   const base={path:"normal",access:"rij",rhythm:"sinus",resp:"spont",peep:8,damping:"optimal",level:0,pos:"supine",
     inserted:0,slackRA:0,slackRV:0,balloonV:0,route:"normal",branch:"rll",whip:false,ruptureRisk:false,rupture:false,chb:false};
@@ -1076,23 +950,123 @@ function applyState(o){
   const v=S.balloonV; S.balloonV=-1; setBalloon(v);
   syncControls(); syncDepth(); if(window.SV3D) SV3D.rebuildPath();
 }
-function loadCase(c,scroll){
-  currentCase=c; if(typeof stopFloat==="function") stopFloat(); applyState(c.set); setTab("pages");
-  $("activeCase").hidden=false; $("activeCaseTxt").textContent="Active page: "+c.title;
-  $("scenario").hidden=false; $("scEyebrow").textContent="Page "+(CASES.indexOf(c)+1)+" · "+c.grp;
-  $("scTitle").textContent=c.title; $("scPrompt").textContent=c.prompt;
-  $("scBasis").innerHTML="Sources: "+c.basis.map(k=>`<a href="${SRC[k].url}" target="_blank" rel="noopener">${SRC[k].label}</a>`).join("; ");
-  $("scAnswer").innerHTML=`<ul>${c.answer.map(p=>`<li>${p}</li>`).join("")}</ul>`; $("scAnswer").hidden=true; $("scReveal").textContent="Show answer";
-  $("feedback").className="feedback"; $("feedback").textContent="Where is the tip?";
-  if(scroll){ const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const el=$("scenario"); const mon=document.querySelector(".monitor"); const narrow=matchMedia("(max-width:980px)").matches;
-    const y=el.getBoundingClientRect().top+window.scrollY-(narrow?mon.offsetHeight+12:12);
-    window.scrollTo({top:y,behavior:reduce?"auto":"smooth"}); }
+/* ================= ABNORMAL READINGS ================= */
+const SRC={
+  ibcc:{label:"EMCrit IBCC",url:"https://emcrit.org/ibcc/rhc/"},
+  litflMeas:{label:"LITFL, PAC measurement",url:"https://litfl.com/troubleshooting-pac-measurement/"},
+  litflPawp:{label:"LITFL, wedge pressure",url:"https://litfl.com/pulmonary-artery-wedge-pressure/"},
+  aneskey:{label:"Hemodynamic waveforms (Anesthesia Key)",url:"https://aneskey.com/interpretation-of-hemodynamic-waveforms/"},
+  atreya:{label:"Atreya 2016 (PA rupture)",url:"https://doi.org/10.3109/17482941.2016.1174270"},
+  abreu:{label:"Abreu 2004 (PA rupture)",url:"https://doi.org/10.1177/0885066604265255"},
+  suzuki:{label:"Suzuki 2026 (MR, right-sided v wave)",url:"https://doi.org/10.1016/j.jccase.2026.03.006"},
+  sasseen:{label:"Sasseen 2003 (post-MI VSR)",url:"https://doi.org/10.1002/ccd.10696"},
+  kapur:{label:"Korabathina 2012 (PAPi)",url:"https://doi.org/10.1002/ccd.23309"},
+  esc:{label:"2022 ESC/ERS PH definitions",url:"https://pmc.ncbi.nlm.nih.gov/articles/PMC10492255/"}
+};
+// nums: [label, value, state] — state "hi", "lo" or "" (normal)
+const ABN_GROUPS=["Shock","After an MI","Pericardium, valves and lungs","Rhythm","Measurement and catheter"];
+const ABN=[
+  {id:"cardiogenic",grp:0,title:"Cardiogenic shock (LV)",sign:"High wedge, low output, low SvO₂",set:{path:"lvshock",inserted:44},
+   nums:[["RA","11","hi"],["PA","50/30","hi"],["Wedge","27","hi"],["CI","1.5","lo"],["SVR","~1550","hi"],["SvO₂","50%","lo"]],
+   why:"The LV can't empty, so pressure backs up into the lungs. Low output drives vasoconstriction and high oxygen extraction.",
+   todo:"Inotrope, afterload reduction once MAP allows, and shock team review. Cardiac power output below 0.6 W argues for mechanical support.",src:["ibcc"]},
+  {id:"septic",grp:0,title:"Septic (distributive) shock",sign:"High output, low SVR, high SvO₂",set:{path:"sepsis",inserted:44},
+   nums:[["RA","5",""],["Wedge","10",""],["CI","4.2","hi"],["SVR","~550","lo"],["SvO₂","80%","hi"]],
+   why:"Vasodilation drops SVR; the heart compensates with high output. Tissues extract less oxygen, so SvO₂ runs high.",
+   todo:"Vasopressors and source control. Normal filling pressures and high output mean an inotrope adds nothing.",src:["ibcc"]},
+  {id:"hypovolemic",grp:0,title:"Hypovolemic shock",sign:"Everything low but SVR",set:{path:"hypo",inserted:44},
+   nums:[["RA","2","lo"],["PA","18/6",""],["Wedge","4","lo"],["CI","1.6","lo"],["SVR","high","hi"],["SvO₂","56%","lo"]],
+   why:"Not enough volume to fill the heart. Low preload, low output, compensatory vasoconstriction. Over-diuresis looks like this.",
+   todo:"Volume, and stop what caused it. In heart failure, a wedge in the mid-teens is the usual target, not a normal value.",src:["ibcc"]},
+  {id:"rvinfarct",grp:0,title:"RV failure (RV infarction)",sign:"RA higher than wedge, narrow PA pulse pressure",set:{path:"rvmi",inserted:44},
+   nums:[["RA","17","hi"],["PA","24/16",""],["Wedge","14",""],["PAPi","0.5","lo"],["RA : wedge","1.2","hi"]],
+   why:"The RV can't push blood through the lungs, so RA pressure rises while the LV is underfilled. PA pulse pressure narrows.",
+   todo:"Preload-dependent: avoid nitrates and diuretics, cautious volume, restore rate and AV synchrony, inotropes, early RV support. PAPi ≤ 0.9 is high risk.",src:["kapur","ibcc"]},
+  {id:"acutemr",grp:1,title:"Acute MR (papillary muscle rupture)",sign:"Giant v waves on the wedge",set:{path:"mr",inserted:50,balloonV:1.5},
+   nums:[["Wedge mean","22","hi"],["v wave","~50","hi"],["PA","54/26","hi"],["CI","low","lo"]],
+   why:"Blood regurgitates into a small, stiff left atrium during systole, producing a tall v wave after the T wave. It can show up as a bump on the PA trace too.",
+   todo:"Read the wedge at the a wave, not the mean. Urgent echo, afterload reduction, mechanical support, and surgery.",src:["suzuki","aneskey","ibcc"]},
+  {id:"vsr",grp:1,title:"Ventricular septal rupture",sign:"Oxygen step-up from RA to PA",set:{path:"vsr",inserted:44},
+   nums:[["RA sat","55%",""],["PA sat","76%","hi"],["Qp : Qs","~1.7","hi"],["RA","14","hi"],["PA","50/26","hi"]],
+   why:"Left-to-right shunt across the septum adds oxygenated blood at the RV. A step-up above about 7% between RA and PA marks the shunt.",
+   todo:"Draw saturations from both ports to see it. Thermodilution overstates systemic output here. Afterload reduction, mechanical support, urgent repair.",src:["sasseen","ibcc"]},
+  {id:"tamponade",grp:2,title:"Tamponade",sign:"RA, PA diastolic and wedge all equal",set:{path:"tamp",inserted:44},
+   nums:[["RA","18","hi"],["PA dia","19","hi"],["Wedge","19","hi"],["CI","low","lo"],["Pulsus","> 10","hi"]],
+   why:"Pericardial fluid compresses all four chambers to the same diastolic pressure. Filling happens only in systole, so the y descent disappears.",
+   todo:"Echo and drainage. After cardiac surgery a localized clot can hide from transthoracic echo.",src:["ibcc","aneskey"]},
+  {id:"constriction",grp:2,title:"Constriction",sign:"RV dip and plateau, deep x and y",set:{path:"constr",inserted:32,balloonV:1.5},
+   nums:[["RV","34/17","hi"],["RA","17","hi"],["Wedge","18","hi"]],
+   why:"A rigid pericardium lets the ventricles fill fast early, then stops them abruptly. RV end-diastolic pressure exceeds a third of systolic, and RA pressure fails to fall with inspiration (Kussmaul).",
+   todo:"Separating constriction from restriction needs simultaneous LV and RV tracings and imaging.",src:["ibcc","aneskey"]},
+  {id:"precap",grp:2,title:"Precapillary pulmonary hypertension",sign:"High PA, normal wedge, wide diastolic gap",set:{path:"pah",inserted:44},
+   nums:[["PA","78/32","hi"],["Mean PA","52","hi"],["Wedge","9",""],["PVR","~12 WU","hi"],["RA","12","hi"]],
+   why:"Disease in the lung vessels raises resistance. Wedge stays normal, so PA diastolic sits far above it. A stiff RV gives a giant a wave on the RA.",
+   todo:"Mean PA above 20, wedge 15 or less and PVR above 2 define it. Avoid aggressive fluid; involve the pulmonary hypertension team.",src:["esc","ibcc"]},
+  {id:"tr",grp:2,title:"Severe tricuspid regurgitation",sign:"Broad c–v wave, steep y descent",set:{path:"tr",inserted:21},
+   nums:[["RA","14","hi"],["v wave","~25","hi"]],
+   why:"The RV ejects back into the RA in systole, replacing the x descent with a large wave, then the RA empties fast (steep y).",
+   todo:"Use the RA mean cautiously. Thermodilution output usually reads low.",src:["aneskey","ibcc"]},
+  {id:"af",grp:3,title:"Atrial fibrillation",sign:"No a waves",set:{rhythm:"af",inserted:21},
+   nums:[["a wave","absent","lo"]],
+   why:"No organized atrial contraction, so the a wave is gone; c and v remain.",
+   todo:"Read the wedge and CVP at the c wave (end-diastole) instead.",src:["ibcc"]},
+  {id:"chb",grp:3,title:"Complete heart block",sign:"Cannon a waves",set:{rhythm:"lbbb",inserted:21,chb:true},
+   nums:[["HR","~34","lo"],["Cannon a","intermittent","hi"]],
+   why:"When the atrium contracts against a closed tricuspid valve, it produces a giant a wave. A catheter in the RV can cause it in a patient with LBBB.",
+   todo:"Pull the catheter back to the RA and support the rate; have pacing ready.",src:["ibcc"]},
+  {id:"zone",grp:4,title:"Not in zone 3",sign:"Smooth wedge above PA diastolic",set:{path:"ards",resp:"vent",peep:16,inserted:50.5,balloonV:1.5,branch:"ant"},
+   nums:[["Wedge","> PA dia","hi"],["a, v waves","absent",""],["Swings","large","hi"]],
+   why:"In a non-dependent branch, alveolar pressure exceeds venous pressure, so the catheter reads the airway, not the left atrium.",
+   todo:"Don't act on this wedge. Reposition to a dependent branch (tip at or below the LA on a lateral film), or use PA diastolic.",src:["litflPawp","ibcc"]},
+  {id:"breathing",grp:4,title:"Respiratory swings",sign:"Numbers move with every breath",set:{path:"lvshock",resp:"vent",peep:10,inserted:50,balloonV:1.5},
+   nums:[["Read at","end-expiration",""]],
+   why:"Intrathoracic pressure adds to every reading. The monitor's digital average includes the swing.",
+   todo:"Ventilated: read the low point before each breath. Breathing on their own: the high point before each breath. Corrected wedge ≈ wedge − 0.36 × PEEP.",src:["ibcc"]},
+  {id:"damped",grp:4,title:"Overdamped line",sign:"Rounded trace, no notch, narrow pulse pressure",set:{inserted:44,damping:"over"},
+   nums:[["Systolic","falsely low","lo"],["Diastolic","falsely high","hi"],["Mean","accurate",""]],
+   why:"Air, clot, kinks or a soft pressure bag absorb the pressure wave.",
+   todo:"Fast-flush test (press Flush): an overdamped line drifts back with no ringing. Fix the line before trusting the numbers.",src:["ibcc","litflMeas"]},
+  {id:"level",grp:4,title:"Transducer off level",sign:"Every pressure shifted by the same amount",set:{inserted:44,level:10},
+   nums:[["Error","~7 per 10 cm","hi"]],
+   why:"A transducer 10 cm below the heart adds about 7 mmHg to every reading (above it subtracts).",
+   todo:"Level to the 4th intercostal space, mid-axillary line, and re-zero before acting on a change.",src:["ibcc"]},
+  {id:"migration",grp:4,title:"Spontaneous wedge",sign:"Wedge tracing with the balloon down",set:{inserted:57},
+   nums:[["PA trace","looks venous",""],["Balloon","down",""]],
+   why:"The catheter softens and drifts into a small branch, which it occludes. Risk of infarction and rupture.",
+   todo:"Don't flush. Pull back with the balloon down until the PA trace returns; confirm on a chest film.",src:["litflMeas","ibcc"]},
+  {id:"rupture",grp:4,title:"Overwedge and PA rupture",sign:"Pressure keeps rising during inflation",set:{path:"pah",rhythm:"af",inserted:52.5,balloonV:1.5,ruptureRisk:true},
+   nums:[["Wedge","climbing","hi"],["Hemoptysis","after inflation","hi"]],
+   why:"A balloon inflated in a small distal branch overdistends it. Pulmonary hypertension, anticoagulation and age raise the risk.",
+   todo:"Deflate at the first change in waveform. With hemoptysis: bleeding side down, secure the airway, reverse anticoagulation, emergent angiography. In severe PH, consider using PA diastolic instead of wedging.",src:["atreya","abreu","ibcc"]}
+];
+let openAbn=null;
+function renderAbn(){
+  $("abnList").innerHTML=ABN_GROUPS.map((gname,gi)=>`<section class="card abngroup"><h2>${gname}</h2>${ABN.filter(a=>a.grp===gi).map(a=>`
+    <div class="abn${openAbn===a.id?" open":""}" id="abn-${a.id}">
+      <button type="button" class="abnhead" data-abn="${a.id}" aria-expanded="${openAbn===a.id}"><span><strong>${a.title}</strong><span class="sign">${a.sign}</span></span><span class="chev" aria-hidden="true">›</span></button>
+      ${openAbn===a.id?`<div class="abnbody">
+        <div class="nums2">${a.nums.map(([k,v,st])=>`<span class="n ${st}"><span class="k">${k}</span><b>${v}</b></span>`).join("")}</div>
+        <p><b>Why</b> ${a.why}</p>
+        <p><b>Do</b> ${a.todo}</p>
+        <p class="basis">${a.src.map(k=>`<a href="${SRC[k].url}" target="_blank" rel="noopener">${SRC[k].label}</a>`).join(" · ")}</p>
+      </div>`:""}
+    </div>`).join("")}</section>`).join("");
 }
-$("scReveal").addEventListener("click",()=>{ const a=$("scAnswer"); a.hidden=!a.hidden; $("scReveal").textContent=a.hidden?"Show answer":"Hide answer"; });
-$("scReload").addEventListener("click",()=>{ if(currentCase) loadCase(currentCase,false); });
-$("scClose").addEventListener("click",()=>{ $("scenario").hidden=true; $("activeCase").hidden=true; currentCase=null; S.ruptureRisk=false; S.rupture=false; S.whip=false; });
-$("btnReset").addEventListener("click",()=>{ $("scenario").hidden=true; $("activeCase").hidden=true; currentCase=null; stopFloat(); applyState({path:S.path,access:S.access,blind:S.blind}); });
+function openAbnormal(id,scroll){
+  const a=ABN.find(x=>x.id===id); if(!a) return;
+  stopFloat();
+  if(openAbn===id && !scroll){ openAbn=null; renderAbn(); return; }
+  openAbn=id; applyState(a.set);
+  if(a.set.chb){ S.chb=true; nextEsc=(V.length?V[V.length-1].t:sampleT)+0.5; }
+  renderAbn();
+  if(scroll){ const el=$("abn-"+id), mon=document.querySelector(".monitor"), narrow=matchMedia("(max-width:980px)").matches;
+    const y=el.getBoundingClientRect().top+window.scrollY-(narrow?mon.offsetHeight+12:12);
+    window.scrollTo({top:y,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}); }
+}
+function clearCase(){ if(openAbn){ openAbn=null; renderAbn(); } }
+$("abnList").addEventListener("click",e=>{ const b=e.target.closest("[data-abn]"); if(b) openAbnormal(b.dataset.abn,false); });
+renderAbn();
+$("btnReset").addEventListener("click",()=>{ clearCase(); stopFloat(); applyState({path:S.path,access:S.access,blind:S.blind}); });
 
 /* ================= ANATOMY + 3D ================= */
 // Coordinates in cm: x = patient's left, y = cranial, z = anterior. Depths are right-IJ depths at the hub.
@@ -1247,9 +1221,8 @@ window.SV3D=(function(){
   return {render,resize,updateCatheter,rebuildPath,setView};
 })();
 
-function clearCase(){ currentCase=null; $("scenario").hidden=true; $("activeCase").hidden=true; }
 /* ================= TABS ================= */
-const TABS=["tracings","sim","numbers","pages"];
+const TABS=["tracings","sim","numbers","abnormal"];
 let currentTab="tracings";
 function setTab(t){
   if(!TABS.includes(t)) t="tracings"; currentTab=t;
@@ -1261,7 +1234,6 @@ document.querySelectorAll(".tabs [data-tab]").forEach(b=>{
   b.addEventListener("click",()=>setTab(b.dataset.tab));
   b.addEventListener("keydown",e=>{ if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return; const i=TABS.indexOf(b.dataset.tab); const n=TABS[(i+(e.key==="ArrowRight"?1:TABS.length-1))%TABS.length]; setTab(n); $("tab-"+n).focus(); });
 });
-$("activeCaseOpen").addEventListener("click",()=>{ setTab("pages"); });
 
 /* ================= TRACINGS TAB ================= */
 const STOPS=[
@@ -1374,26 +1346,6 @@ $("btnFloat").addEventListener("click",()=>{
     setInserted(S.inserted+0.5);
   },260);
 });
-const CHANGES=[
-  ["Physiology"],
-  ["Giant v waves on the wedge","Acute MR. The mean overstates LV filling; read at the a wave.",{path:"mr",inserted:50,balloonV:1.5}],
-  ["No a waves","Atrial fibrillation. Read the wedge at the c wave.",{rhythm:"af",inserted:21}],
-  ["Cannon a waves","Complete heart block: the atrium contracts against a closed valve.",{rhythm:"lbbb",inserted:21,chb:true}],
-  ["Everything equal","Tamponade: RA, PA diastolic and wedge all near 19.",{path:"tamp",inserted:44}],
-  ["RA higher than wedge","RV failure, here from RV infarction.",{path:"rvmi",inserted:44}],
-  ["Wide PA diastolic–wedge gap","Precapillary pulmonary hypertension.",{path:"pah",inserted:44}],
-  ["Catheter and line"],
-  ["Wedge with the balloon down","Distal migration. Withdraw with the balloon down.",{inserted:57}],
-  ["Pressure keeps rising","Overwedge. Deflate now.",{inserted:52,balloonV:1.5}],
-  ["Smooth wedge above PA diastolic","Not zone 3: the trace follows airway pressure.",{path:"ards",resp:"vent",peep:16,inserted:50.5,balloonV:1.5,branch:"ant"}],
-  ["Big swings with each breath","Read at end-expiration.",{path:"lvshock",resp:"vent",peep:10,inserted:50,balloonV:1.5}],
-  ["Rounded, no notch","Overdamped line. Press Flush.",{inserted:44,damping:"over"}],
-  ["Every number up 7","Transducer 10 cm below the phlebostatic axis.",{inserted:44,level:10}]
-];
-$("changes").innerHTML=CHANGES.map((c,i)=>c.length===1?`<h3>${c[0]}</h3>`:`<div class="change"><strong>${c[0]}</strong><p>${c[1]}</p><button class="small" type="button" data-ch="${i}">Show</button></div>`).join("");
-$("changes").addEventListener("click",e=>{ const b=e.target.closest("[data-ch]"); if(!b) return; stopFloat(); clearCase(); const set=CHANGES[+b.dataset.ch][2];
-  applyState(set); if(set.chb){ S.chb=true; nextEsc=(V.length?V[V.length-1].t:sampleT)+0.5; } });
-
 /* ================= BOOT ================= */
 let tick=0;
 function frame(ts){
@@ -1415,8 +1367,7 @@ if(window.ResizeObserver){ new ResizeObserver(onResize).observe($("viewer")); }
   applyState(Object.assign({path:"normal"},STOPS[0].set));
   if(window.SV3D) SV3D.setView("3d");
   syncControls(); renderStop();
-  const c=CASES.find(x=>x.id===h);
-  if(c){ loadCase(c,false); }
+  if(ABN.some(x=>x.id===h)){ setTab("abnormal"); openAbnormal(h,false); }
   else if(TABS.includes(h)) setTab(h);
   else if(PATHS[h]){ applyState({path:h,inserted:44}); setTab("sim"); }
   else setTab(tab||"tracings");
