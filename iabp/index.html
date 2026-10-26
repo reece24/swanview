@@ -309,7 +309,7 @@ footer a{color:var(--accent)}
         <span class="lbl">Inflate</span>
         <div class="rowc"><input type="range" id="infl" min="-150" max="200" step="10" value="0" aria-label="Inflation timing relative to the dicrotic notch, ms"><output id="inflOut">at notch</output></div>
         <span class="lbl">Deflate</span>
-        <div class="rowc"><input type="range" id="defl" min="-350" max="150" step="10" value="0" aria-label="Deflation timing relative to the next systole, ms"><output id="deflOut">just before systole</output></div>
+        <div class="rowc"><input type="range" id="defl" min="-300" max="250" step="10" value="0" aria-label="Deflation timing relative to the next systole, ms"><output id="deflOut">just before systole</output></div>
         <span class="lbl">Position</span>
         <div class="rowc"><div class="seg" data-key="pos"><button type="button" data-val="ok">Correct</button><button type="button" data-val="high">Too high</button><button type="button" data-val="low">Too low</button></div></div>
       </section>
@@ -479,18 +479,19 @@ function cycleInfo(i){
   const b=V[i], nb=V[i+1]; const e=E(b), en=nb?E(nb):e+60/S.hr;
   const notch=e+0.30*b.q+0.005;
   const as=isAssisted(b);
-  return {b,e,en,RR:en-e,notch,as,tI:notch+S.infl/1000,tD:en-0.045+S.defl/1000};
+  return {b,e,en,RR:en-e,notch,as,tI:notch+S.infl/1000,tD:en-0.10+S.defl/1000};
 }
-const DIP=19, AUG0=40, UP=0.075, AUG_TAU=0.26;
-const FALL=0.07;
+const DIP=13, AUG0=38, UP=0.08, AUG_TAU=0.30;
+const FALL=0.10;
 const smooth=x=>x<=0?0:x>=1?1:x*x*(3-2*x);
 function augv(x){ // pressure added while the balloon is inflated, x seconds after inflation
   const A0=AUG0*augFactor()*Math.exp(-Math.max(0,S.infl)/220);
-  return x<=0?0:A0*(x<UP?Math.sin(Math.PI/2*x/UP):Math.exp(-(x-UP)/AUG_TAU));
+  if(x<=0) return 0; if(x<UP) return A0*Math.sin(Math.PI/2*x/UP);
+  const y=x-UP; return A0*Math.exp(-(Math.hypot(y,0.035)-0.035)/AUG_TAU); // flat at the top, then exponential run-off
 }
 function afterDefl(c,x){ // pressure change x seconds after deflation: fast, continuous fall from the augmented level into the dip
   const a=augv(c.tD-c.tI), f=smooth(x/FALL);
-  return a*(1-f)-DIP*augFactor()*Math.sin(Math.PI/2*Math.min(1,x/FALL))*Math.exp(-Math.max(0,x-FALL)/0.10);
+  return a*(1-f)-DIP*augFactor()*f*Math.exp(-Math.max(0,x-FALL)/0.12);
 }
 function balloonAt(c,t){
   if(!c.as) return {add:0,inflated:false};
@@ -686,11 +687,11 @@ const TIMING=[
    what:"Pressure falls past the notch before the balloon fills, so augmentation starts late and peaks low.",
    harm:"Less diastolic augmentation and less coronary perfusion.",
    fix:"Move inflation earlier, to the notch."},
-  {id:"earlydefl",title:"Early deflation",sign:"Sharp drop in mid-diastole, then a U-shaped plateau",set:{defl:-300},
+  {id:"earlydefl",title:"Early deflation",sign:"Sharp drop in mid-diastole, then a U-shaped plateau",set:{defl:-200},
    what:"The balloon empties long before the next systole, and pressure drifts back up before the heart ejects.",
    harm:"No afterload reduction. Coronary and carotid flow can reverse during the dip, which can cause angina.",
    fix:"Deflate later, just before the next upstroke."},
-  {id:"latedefl",title:"Late deflation",sign:"No dip; assisted end-diastole as high as unassisted; wide, slow upstroke",set:{defl:120},
+  {id:"latedefl",title:"Late deflation",sign:"No dip; assisted end-diastole as high as unassisted; wide, slow upstroke",set:{defl:190},
    what:"The balloon is still inflated when the LV starts to eject.",
    harm:"The LV pushes against the balloon: afterload and oxygen demand go up instead of down. Potentially harmful.",
    fix:"Deflate earlier, just before systole."}
