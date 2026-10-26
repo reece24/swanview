@@ -464,14 +464,14 @@ function ecgV(t){
 // dicrotic notch (+ inflation offset) and deflates just before e_{k+1} (+ deflation offset).
 const E=b=>b.t+0.06;
 function ejectShape(u,q,RRb,tau){
-  // Central aortic pressure: slower upstroke than radial, rounded peak, sharp incisura about three-quarters of the way up the pulse pressure.
-  const rise=0.09*q, pk=0.14*q, ej=0.30*q; let f;
+  // Aortic beat as drawn in IABP teaching figures: rounded systolic hump, dicrotic notch about halfway down
+  // the pulse pressure, then exponential diastolic run-off.
+  const pk=0.13*q, ej=0.30*q, NOTCH=0.52; let f;
   if(u<0) f=0;
-  else if(u<rise) f=0.9*Math.sin(Math.PI/2*u/rise);
-  else if(u<pk) f=0.9+0.1*Math.sin(Math.PI/2*(u-rise)/(pk-rise));
-  else if(u<ej) f=1-0.24*Math.pow((u-pk)/(ej-pk),1.4);
-  else { const Ee=Math.exp(-Math.max(0.05,RRb-ej)/tau); f=0.76*(Math.exp(-(u-ej)/tau)-Ee)/(1-Ee); }
-  f-=0.09*g(u,ej+0.006,0.01); f+=0.025*g(u,ej+0.04,0.02);
+  else if(u<pk) f=Math.sin(Math.PI/2*u/pk);
+  else if(u<ej) f=NOTCH+(1-NOTCH)*0.5*(1+Math.cos(Math.PI*(u-pk)/(ej-pk)));
+  else { const Ee=Math.exp(-Math.max(0.05,RRb-ej)/tau); f=NOTCH*(Math.exp(-(u-ej)/tau)-Ee)/(1-Ee); }
+  f-=0.05*g(u,ej+0.004,0.008); f+=0.04*g(u,ej+0.03,0.018);
   return Math.max(0,f);
 }
 const isAssisted=b=>S.ratio>0 && b.n%S.ratio===0;
@@ -481,16 +481,16 @@ function cycleInfo(i){
   const as=isAssisted(b);
   return {b,e,en,RR:en-e,notch,as,tI:notch+S.infl/1000,tD:en-0.045+S.defl/1000};
 }
-const DIP=15, AUG0=30, UP=0.085;
-const FALL=0.05;
+const DIP=19, AUG0=40, UP=0.075, AUG_TAU=0.26;
+const FALL=0.07;
 const smooth=x=>x<=0?0:x>=1?1:x*x*(3-2*x);
 function augv(x){ // pressure added while the balloon is inflated, x seconds after inflation
   const A0=AUG0*augFactor()*Math.exp(-Math.max(0,S.infl)/220);
-  return x<=0?0:A0*(x<UP?Math.sin(Math.PI/2*x/UP):1)*Math.exp(-Math.max(0,x-UP)/0.75);
+  return x<=0?0:A0*(x<UP?Math.sin(Math.PI/2*x/UP):Math.exp(-(x-UP)/AUG_TAU));
 }
 function afterDefl(c,x){ // pressure change x seconds after deflation: fast, continuous fall from the augmented level into the dip
   const a=augv(c.tD-c.tI), f=smooth(x/FALL);
-  return a*(1-f)-DIP*augFactor()*f*Math.exp(-Math.max(0,x-FALL)/0.11);
+  return a*(1-f)-DIP*augFactor()*Math.sin(Math.PI/2*Math.min(1,x/FALL))*Math.exp(-Math.max(0,x-FALL)/0.10);
 }
 function balloonAt(c,t){
   if(!c.as) return {add:0,inflated:false};
