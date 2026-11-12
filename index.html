@@ -442,8 +442,8 @@ footer a{color:var(--accent)}
           <div class="glabel">Indices for shock</div>
           <div class="defs compact">
             <div class="def"><div class="dh"><b>PAPi</b><span>&gt; 0.9</span></div><p class="formula">(PA systolic − PA diastolic) / RA</p><p>0.9 or less flags severe RV failure after inferior MI.</p></div>
-            <div class="def"><div class="dh"><b>RA : wedge</b><span>&lt; 0.6</span></div><p>Above 0.6–0.8 points to the RV as the main problem.</p></div>
-            <div class="def"><div class="dh"><b>Cardiac power output</b><span>&gt; 0.6 W</span></div><p class="formula">MAP × CO / 451</p><p>Below 0.6 W predicts death in cardiogenic shock.</p></div>
+            <div class="def"><div class="dh"><b>RA : wedge</b><span>~0.5</span></div><p>Above about 0.8 points to the RV as the main problem (seen in RV infarction).</p></div>
+            <div class="def"><div class="dh"><b>Cardiac power output</b><span>&gt; 0.6 W</span></div><p class="formula">MAP × CO / 451</p><p>Below 0.6 W was the strongest hemodynamic predictor of in-hospital death in the SHOCK registry.</p></div>
           </div>
         </section>
 
@@ -977,7 +977,7 @@ const ABN=[
   {id:"septic",grp:0,title:"Septic (distributive) shock",sign:"High output, low SVR, high SvO₂",set:{path:"sepsis",inserted:44},
    nums:[["RA","5",""],["Wedge","10",""],["CI","4.2","hi"],["SVR","~550","lo"],["SvO₂","80%","hi"]],
    why:"Vasodilation drops SVR; the heart compensates with high output. Tissues extract less oxygen, so SvO₂ runs high.",
-   todo:"Vasopressors and source control. Normal filling pressures and high output mean an inotrope adds nothing.",src:["ibcc"]},
+   todo:"Vasopressors and source control. With normal filling pressures and high output an inotrope is usually not needed; reconsider if output falls (septic cardiomyopathy).",src:["ibcc"]},
   {id:"hypovolemic",grp:0,title:"Hypovolemic shock",sign:"Everything low but SVR",set:{path:"hypo",inserted:44},
    nums:[["RA","2","lo"],["PA","18/6",""],["Wedge","4","lo"],["CI","1.6","lo"],["SVR","high","hi"],["SvO₂","56%","lo"]],
    why:"Not enough volume to fill the heart. Low preload, low output, compensatory vasoconstriction. Over-diuresis looks like this.",
@@ -988,12 +988,12 @@ const ABN=[
    todo:"Preload-dependent: avoid nitrates and diuretics, cautious volume, restore rate and AV synchrony, inotropes, early RV support. PAPi ≤ 0.9 is high risk.",src:["kapur","ibcc"]},
   {id:"acutemr",grp:1,title:"Acute MR (papillary muscle rupture)",sign:"Giant v waves on the wedge",set:{path:"mr",inserted:50,balloonV:1.5},
    nums:[["Wedge mean","22","hi"],["v wave","~50","hi"],["PA","54/26","hi"],["CI","low","lo"]],
-   why:"Blood regurgitates into a small, stiff left atrium during systole, producing a tall v wave after the T wave. It can show up as a bump on the PA trace too.",
+   why:"Blood regurgitates into a normal-sized, non-compliant left atrium during systole, producing a tall v wave after the T wave. It can show up as a bump on the PA trace too. Giant v waves are not specific: a VSR, volume overload or a stiff left atrium can produce them, and chronic MR may show none.",
    todo:"Read the wedge at the a wave, not the mean. Urgent echo, afterload reduction, mechanical support, and surgery.",src:["suzuki","aneskey","ibcc"]},
   {id:"vsr",grp:1,title:"Ventricular septal rupture",sign:"Oxygen step-up from RA to PA",set:{path:"vsr",inserted:44},
    nums:[["RA sat","55%",""],["PA sat","76%","hi"],["Qp : Qs","~1.7","hi"],["RA","14","hi"],["PA","50/26","hi"]],
-   why:"Left-to-right shunt across the septum adds oxygenated blood at the RV. A saturation step-up of more than about 7% from the RA to the PA marks the shunt.",
-   todo:"Draw saturations from both ports to see it. Thermodilution overstates systemic output here. Afterload reduction, mechanical support, urgent repair.",src:["sasseen","ibcc"]},
+   why:"Left-to-right shunt across the septum adds oxygenated blood at the RV. A saturation step-up of 5% or more from the RA to the RV or PA marks a ventricular-level shunt (7% or more for an atrial-level shunt; 8% or more from SVC to PA as a screen).",
+   todo:"Draw saturations from both ports to see it. Qp:Qs = (arterial − mixed venous) / (pulmonary venous − PA), using the arterial saturation for pulmonary venous. Thermodilution measures pulmonary flow, so it overstates systemic output here; use Fick. Afterload reduction, mechanical support, urgent repair.",src:["sasseen","ibcc"]},
   {id:"tamponade",grp:2,title:"Tamponade",sign:"RA, PA diastolic and wedge all equal",set:{path:"tamp",inserted:44},
    nums:[["RA","18","hi"],["PA dia","19","hi"],["Wedge","19","hi"],["CI","low","lo"],["Pulsus","> 10","hi"]],
    why:"Pericardial fluid compresses all four chambers to the same diastolic pressure. Filling happens only in systole, so the y descent disappears.",
@@ -1009,7 +1009,7 @@ const ABN=[
   {id:"tr",grp:2,title:"Severe tricuspid regurgitation",sign:"Broad c–v wave, steep y descent",set:{path:"tr",inserted:21},
    nums:[["RA","14","hi"],["v wave","~25","hi"]],
    why:"The RV ejects back into the RA in systole, replacing the x descent with a large wave, then the RA empties fast (steep y).",
-   todo:"Read the RA at end-diastole (the base of the c–v wave), not the mean. Thermodilution output can read low.",src:["aneskey","ibcc"]},
+   todo:"Read the RA at end-diastole (the base of the c–v wave), not the mean. Thermodilution output is unreliable in severe TR; use Fick.",src:["aneskey","ibcc"]},
   {id:"af",grp:3,title:"Atrial fibrillation",sign:"No a waves",set:{rhythm:"af",inserted:21},
    nums:[["a wave","absent","lo"]],
    why:"No organized atrial contraction, so the a wave is gone; c and v remain.",
@@ -1025,7 +1025,7 @@ const ABN=[
   {id:"breathing",grp:4,title:"Respiratory swings",sign:"Numbers move with every breath",set:{path:"lvshock",resp:"vent",peep:10,inserted:50,balloonV:1.5},
    nums:[["Read at","end-expiration",""]],
    why:"Intrathoracic pressure adds to every reading. The monitor's digital average includes the swing.",
-   todo:"Ventilated: read the low point before each breath. Breathing on their own: the high point before each breath. Corrected wedge ≈ wedge − 0.36 × PEEP.",src:["ibcc"]},
+   todo:"Ventilated: read the low point before each breath. Breathing on their own: the high point before each breath. On high PEEP, part of it is transmitted to the wedge (very roughly a third of the PEEP in cmH₂O, less in stiff lungs), so treat the number as an upper bound.",src:["ibcc"]},
   {id:"damped",grp:4,title:"Overdamped line",sign:"Rounded trace, no notch, narrow pulse pressure",set:{inserted:44,damping:"over"},
    nums:[["Systolic","falsely low","lo"],["Diastolic","falsely high","hi"],["Mean","accurate",""]],
    why:"Air, clot, kinks or a soft pressure bag absorb the pressure wave.",
@@ -1043,6 +1043,17 @@ const ABN=[
    why:"A balloon inflated in a small distal branch overdistends it. Pulmonary hypertension, anticoagulation and age raise the risk.",
    todo:"Deflate at the first change in waveform. With hemoptysis: bleeding side down, secure the airway, reverse anticoagulation, emergent angiography. In severe PH, consider using PA diastolic instead of wedging.",src:["atreya","abreu","ibcc"]}
 ];
+// Tiles are calculated from the simulator's own values (BSA 2.0 m²) so they always match the monitor.
+(function(){
+  const H=k=>{ const q=PATHS[k], map=(q.art[0]+2*q.art[1])/3, mpa=(q.pa.s+2*q.pa.d)/3;
+    return {q,mpa,ci:q.co/2,svr:80*(map-q.ra.m)/q.co,pvr:(mpa-q.w.m)/q.co,papi:(q.pa.s-q.pa.d)/q.ra.m}; };
+  const r=Math.round, r50=v=>"~"+r(v/50)*50, f1=v=>v.toFixed(1);
+  const F={RA:h=>r(h.q.ra.m),PA:h=>h.q.pa.s+"/"+h.q.pa.d,Wedge:h=>r(h.q.w.m),CI:h=>f1(h.ci),SVR:h=>r50(h.svr),"SvO₂":h=>h.q.sat.pa+"%",
+    "Mean PA":h=>r(h.mpa),PVR:h=>"~"+r(h.pvr)+" WU",PAPi:h=>f1(h.papi),"RA : wedge":h=>f1(h.q.ra.m/h.q.w.m),
+    "RA sat":h=>h.q.sat.ra+"%","PA sat":h=>h.q.sat.pa+"%","Qp : Qs":h=>"~"+f1((h.q.sat.art-h.q.sat.ra)/(h.q.sat.art-h.q.sat.pa))};
+  for(const a of ABN){ if(!["cardiogenic","septic","hypovolemic","rvinfarct","vsr","precap"].includes(a.id)) continue;
+    const h=H(a.set.path); for(const n of a.nums){ if(F[n[0]]) n[1]=F[n[0]](h); } }
+})();
 let openAbn=null;
 function renderAbn(){
   $("abnList").innerHTML=ABN_GROUPS.map((gname,gi)=>`<section class="card abngroup"><h2>${gname}</h2>${ABN.filter(a=>a.grp===gi).map(a=>`
