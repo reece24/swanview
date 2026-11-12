@@ -616,7 +616,7 @@ function atrialP(t,p,delay){
   for(const b of V){ const tR=b.t,q=b.q; if(t<tR-0.15||t>tR+1.2) continue;
     if(!delay) v+=0.35*Math.max(p.a,2)*g(t,tR+0.06,0.022); // c wave: damped out in the wedge
     if(p.tr) v+=p.v*0.85*g(t,tR+0.22*q+delay,0.08); else v-=p.x*g(t,tR+0.16*q+delay,0.05);
-    v+=p.v*b.str*g(t,tR+0.40*q+delay,p.vs||0.05);
+    { const cv=tR+0.40*q+delay; v+=p.v*b.str*g(t,cv,p.vs?(t<cv?p.vs*1.25:p.vs*0.65):0.05); } // giant v: slower rise, steep y descent
     v-=p.y*g(t,tR+0.56*q+delay,0.06);
   }
   return v;
